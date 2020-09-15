@@ -6,7 +6,7 @@ const websiteurlEl = document.getElementById('website-url');
 const bookmarkForm = document.getElementById('bookmark-form');
 const bookmarkCont = document.getElementById('bookmarks-container');
 
-let bookmarks = [];
+let bookmarks = {};
 
 function showModal() {
     modal.classList.toggle('show-modal');
@@ -35,12 +35,10 @@ function closeForm() {
 }
 
 // Delete bookmark
-function deleteBookmark(url) {
-    bookmarks.forEach((bookmark, i) => {
-        if (bookmark.url === url) {
-            bookmarks.splice(i, 1);
-        }
-    });
+function deleteBookmark(id) {
+    if (bookmarks[id]) {
+        delete bookmarks[id];
+    }
 
     localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
     fetchBookmarks();
@@ -50,9 +48,10 @@ function deleteBookmark(url) {
 function buildBookmarks() {
 
     bookmarkCont.textContent = '';
-
-    bookmarks.forEach((bookmark) => {
-        const {name, url} = bookmark;
+    
+    Object.keys(bookmarks).forEach((id) => {
+        
+        const {name, url} = bookmarks[id];
         // Item
         const item = document.createElement('div');
         item.classList.add('item');
@@ -89,11 +88,11 @@ function fetchBookmarks() {
     if (localStorage.getItem('bookmarks')) {
         bookmarks = JSON.parse(localStorage.getItem('bookmarks'));
     } else {
-        bookmarks = [{
+        let id = 'https://google.com';
+        bookmarks[id] = {
             name: 'google',
             url: 'https://google.com',
-        },
-        ];
+        };
     };
 
     buildBookmarks();
@@ -117,7 +116,7 @@ function storeBookmark(e) {
         url: url,
     };
 
-    bookmarks.push(bookmark);
+    bookmarks[url] = bookmark;
 
     localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
     fetchBookmarks();
